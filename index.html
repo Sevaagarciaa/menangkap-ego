@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mengejar EGO PEBI</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+
+        .title-font {
+            font-family: 'Fredoka', cursive;
+        }
+
+        /* Animated Background Gradient */
+        .bg-animated {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #311042, #180e29);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glowing Badge EGO PEBI */
+        .ego-badge {
+            transition: transform 0.08s ease-out, top 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.8), 0 0 50px rgba(168, 85, 247, 0.5);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 20px rgba(236, 72, 153, 0.8), 0 0 40px rgba(168, 85, 247, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 35px rgba(236, 72, 153, 1), 0 0 70px rgba(168, 85, 247, 0.8), 0 0 100px rgba(244, 63, 94, 0.6);
+            }
+        }
+
+        /* Floating Text Animation */
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+        }
+
+        .floating-text {
+            position: absolute;
+            animation: floatUp 1.2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Design */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-animated h-screen w-screen flex flex-col justify-between items-center relative p-3 sm:p-4 text-white">
+
+    <!-- Canvas untuk Efek Partikel Background -->
+    <canvas id="particleCanvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Header / HUD -->
+    <header class="z-10 w-full max-w-5xl flex flex-col md:flex-row justify-between items-center gap-3 mt-1 px-2">
+        <div class="text-center md:text-left">
+            <h1 class="title-font text-2xl sm:text-4xl font-extrabold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-indigo-300 drop-shadow">
+                <i class="fa-solid fa-crown text-amber-400 mr-2"></i>MENGEJAR EGO PEBI
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-300 font-medium">Coba raih tombolnya kalau kamu bisa!</p>
+        </div>
+
+        <!-- Counter & Status Dashboard -->
+        <div class="glass-card px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl flex items-center gap-4 sm:gap-6 shadow-lg border border-white/20">
+            <div class="text-center">
+                <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-bold tracking-wider">Percobaan</p>
+                <p id="attemptCounter" class="text-xl sm:text-3xl font-black text-pink-400">0</p>
+            </div>
+            <div class="h-8 w-px bg-slate-700"></div>
+            <div class="text-center">
+                <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-bold tracking-wider">Tingkat Gengsi</p>
+                <p id="egoLevel" class="text-lg sm:text-2xl font-bold text-amber-400">100%</p>
+            </div>
+            <div class="h-8 w-px bg-slate-700"></div>
+            <div class="text-center">
+                <p class="text-[10px] sm:text-xs text-slate-400 uppercase font-bold tracking-wider">File Audio</p>
+                <span id="audioStatusBadge" class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 mt-1">
+                    <i class="fa-solid fa-file-audio"></i> Custom MP3
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Message Banner -->
+    <div class="z-10 text-center my-auto w-full max-w-lg px-4 pointer-events-none">
+        <div id="messageBox" class="glass-card px-5 py-3 sm:px-6 sm:py-4 rounded-2xl transition-all duration-300 transform scale-100 shadow-xl border border-pink-500/30">
+            <p id="funnyMessage" class="text-sm sm:text-lg font-semibold text-pink-200 tracking-wide italic">
+                "Ayo dekati tombol EGO PEBI kalau berani! 😜"
+            </p>
+        </div>
+    </div>
+
+    <!-- TARGET UNTOUCHABLE: EGO PEBI BUTTON -->
+    <div id="egoPebi" class="ego-badge absolute z-20 cursor-pointer select-none px-6 py-3.5 sm:px-8 sm:py-4 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 rounded-full flex items-center gap-3 border-2 border-white/60 active:scale-95">
+        <i class="fa-solid fa-fire-flame-curved text-amber-300 text-xl sm:text-2xl animate-bounce"></i>
+        <span class="title-font text-lg sm:text-2xl font-black text-white tracking-wider whitespace-nowrap drop-shadow-md">
+            EGO PEBI
+        </span>
+        <i class="fa-solid fa-sparkles text-yellow-300 text-lg"></i>
+    </div>
+
+    <!-- FOOTER CONTROLS -->
+    <footer class="z-10 w-full max-w-3xl mb-3 flex flex-wrap justify-center items-center gap-2 sm:gap-3 px-2">
+        <div class="glass-card p-2 sm:p-3 rounded-2xl shadow-2xl flex flex-wrap justify-center items-center gap-2 sm:gap-3 border border-white/10">
+            <!-- Mute/Unmute -->
+            <button id="toggleAudioBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-medium text-xs sm:text-sm flex items-center gap-2 transition active:scale-95 border border-white/10">
+                <i id="audioIcon" class="fa-solid fa-volume-high text-pink-400"></i>
+                <span id="audioText">Suara: ON</span>
+            </button>
+
+            <!-- Test Sound -->
+            <button id="testAudioBtn" class="bg-indigo-600/40 hover:bg-indigo-600/60 text-indigo-200 px-3 py-2 rounded-xl font-medium text-xs sm:text-sm flex items-center gap-1.5 transition border border-indigo-400/30 active:scale-95">
+                <i class="fa-solid fa-play text-xs"></i>
+                Tes Sound
+            </button>
+
+            <!-- Custom Audio Input Fallback -->
+            <label class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 cursor-pointer px-3 py-2 rounded-xl font-medium text-xs sm:text-sm flex items-center gap-1.5 transition border border-amber-500/30 active:scale-95">
+                <i class="fa-solid fa-upload text-xs"></i>
+                Pilih File Lain
+                <input type="file" id="audioFileInput" accept="audio/*" class="hidden">
+            </label>
+
+            <!-- Reset Game -->
+            <button id="resetGameBtn" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 hover:text-rose-200 px-3 py-2 sm:px-4 sm:py-2 rounded-xl font-medium text-xs sm:text-sm flex items-center gap-2 transition border border-rose-500/30 active:scale-95">
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset Game
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const egoPebi = document.getElementById('egoPebi');
+        const attemptCounterEl = document.getElementById('attemptCounter');
+        const egoLevelEl = document.getElementById('egoLevel');
+        const funnyMessageEl = document.getElementById('funnyMessage');
+        const messageBox = document.getElementById('messageBox');
+        const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+        const testAudioBtn = document.getElementById('testAudioBtn');
+        const audioFileInput = document.getElementById('audioFileInput');
+        const audioIcon = document.getElementById('audioIcon');
+        const audioText = document.getElementById('audioText');
+        const resetGameBtn = document.getElementById('resetGameBtn');
+        const audioStatusBadge = document.getElementById('audioStatusBadge');
+
+        // State Variables
+        let attempts = 0;
+        let isAudioMuted = false;
+        let lastMoveTime = 0;
+        const fleeThreshold = 140; // Jarak kursor dalam piksel sebelum tombol kabur
+
+        // --- PENGGUNAAN FILE AUDIO LOKAL KAMU HASIL PEMANGGILAN JAVASCRIPT ---
+        const localAudioPath = 'Sound Effect Eits Tidak Kena.mp3';
+        let customAudio = new Audio(localAudioPath);
+        customAudio.preload = 'auto';
+
+        // Event listener jika file audio berhasil/gagal dimuat
+        customAudio.addEventListener('error', () => {
+            console.warn("File 'Sound Effect Eits Tidak Kena.mp3' tidak ditemukan di folder yang sama. Menyiapkan Speech Synthesis fallback.");
+            audioStatusBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Fallback Synth`;
+            audioStatusBadge.className = "inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/30 text-amber-300 border border-amber-400/30 mt-1";
+        });
+
+        // Pengaturan Input File Audio Manual (Fallback jika user upload dari browser)
+        audioFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const objectURL = URL.createObjectURL(file);
+                customAudio = new Audio(objectURL);
+                customAudio.preload = 'auto';
+                audioStatusBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${file.name.substring(0, 10)}...`;
+                audioStatusBadge.className = "inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 mt-1";
+                playEitsSound();
+            }
+        });
+
+        // FUNGSI MEMUTAR AUDIO LOKAL DENGAN REPLAY INSTAN
+        function playEitsSound() {
+            if (isAudioMuted) return;
+
+            // Memutar audio kustom MP3
+            customAudio.currentTime = 0;
+            const playPromise = customAudio.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    // Fallback Speech Synthesis jika browser memblokir autoplays atau file belum ada
+                    if ('speechSynthesis' in window) {
+                        window.speechSynthesis.cancel();
+                        const speech = new SpeechSynthesisUtterance("Eits, gak kena!");
+                        speech.lang = 'id-ID';
+                        speech.rate = 1.6;
+                        speech.pitch = 1.5;
+                        window.speechSynthesis.speak(speech);
+                    }
+                });
+            }
+        }
+
+        // Daftar Pesan Lucu
+        const funnyMessages = [
+            "Eits, gak kena! 😜",
+            "Ego PEBI terlalu tinggi untuk digapai!",
+            "Tingkat gengsi: 99999%! 🚀",
+            "Masih coba mengejar? Capek deh...",
+            "Dikit lagi... tapi tetep gak kena! 🤪",
+            "WKWKWK refleksmu kurang cepat!",
+            "Jangan mimpi bisa menyentuh Ego PEBI!",
+            "Bahkan kecepatan cahaya kalah cepat!",
+            "Eits! Meluncur ke angkasa~ ✨",
+            "Nyerah aja bro, gak bakal bisa! 🤪"
+        ];
+
+        // Posisi awal EGO PEBI di tengah layar
+        function centerEgo() {
+            const rect = egoPebi.getBoundingClientRect();
+            const x = (window.innerWidth / 2) - (rect.width / 2);
+            const y = (window.innerHeight / 2) - (rect.height / 2);
+            egoPebi.style.left = `${x}px`;
+            egoPebi.style.top = `${y}px`;
+        }
+
+        // FUNGSI UTAMA: MENGHINDAR & MEMANGGIL SOUND
+        function moveEgo() {
+            const now = Date.now();
+            if (now - lastMoveTime < 50) return; // Mencegah spam berlebihan
+            lastMoveTime = now;
+
+            const egoRect = egoPebi.getBoundingClientRect();
+            const padding = 20;
+
+            const maxX = window.innerWidth - egoRect.width - padding;
+            const maxY = window.innerHeight - egoRect.height - padding - 80;
+
+            let newX = Math.max(padding, Math.floor(Math.random() * maxX));
+            let newY = Math.max(80, Math.floor(Math.random() * maxY));
+
+            egoPebi.style.left = `${newX}px`;
+            egoPebi.style.top = `${newY}px`;
+
+            // Tambah Statistik
+            attempts++;
+            attemptCounterEl.textContent = attempts;
+            egoLevelEl.textContent = `${100 + attempts * 50}%`;
+
+            // PUTAR SUARA MP3 "Eits Tidak Kena"
+            playEitsSound();
+
+            // Animasi & Pesan Lucu
+            updateFunnyMessage();
+            spawnFloatingText(egoRect.left + egoRect.width / 2, egoRect.top);
+        }
+
+        function updateFunnyMessage() {
+            const randomIndex = Math.floor(Math.random() * funnyMessages.length);
+            funnyMessageEl.textContent = `"${funnyMessages[randomIndex]}"`;
+
+            messageBox.classList.remove('scale-100');
+            messageBox.classList.add('scale-105', 'border-pink-400');
+            setTimeout(() => {
+                messageBox.classList.remove('scale-105', 'border-pink-400');
+                messageBox.classList.add('scale-100');
+            }, 150);
+        }
+
+        function spawnFloatingText(x, y) {
+            const texts = ["EITS!", "GAK KENA!", "WUSSS!", "LOL 🤪", "CUPU!", "ZOOOM!"];
+            const txt = document.createElement('div');
+            txt.className = 'floating-text text-amber-300 font-extrabold text-lg sm:text-xl drop-shadow-md z-30';
+            txt.textContent = texts[Math.floor(Math.random() * texts.length)];
+            txt.style.left = `${x - 30}px`;
+            txt.style.top = `${y - 10}px`;
+
+            document.body.appendChild(txt);
+            setTimeout(() => txt.remove(), 1200);
+        }
+
+        // EVENT LISTENERS DETEKSI DEKAT (MOUSE & TOUCH)
+        document.addEventListener('mousemove', (e) => {
+            const egoRect = egoPebi.getBoundingClientRect();
+            const egoCenterX = egoRect.left + egoRect.width / 2;
+            const egoCenterY = egoRect.top + egoRect.height / 2;
+
+            const distance = Math.hypot(e.clientX - egoCenterX, e.clientY - egoCenterY);
+            if (distance < fleeThreshold) {
+                moveEgo();
+            }
+        });
+
+        egoPebi.addEventListener('mouseover', moveEgo);
+        egoPebi.addEventListener('click', moveEgo);
+        egoPebi.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveEgo();
+        }, { passive: false });
+
+        // Toggle Audio Mute
+        toggleAudioBtn.addEventListener('click', () => {
+            isAudioMuted = !isAudioMuted;
+            if (isAudioMuted) {
+                audioIcon.className = 'fa-solid fa-volume-xmark text-slate-400';
+                audioText.textContent = 'Suara: OFF';
+                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            } else {
+                audioIcon.className = 'fa-solid fa-volume-high text-pink-400';
+                audioText.textContent = 'Suara: ON';
+            }
+        });
+
+        // Tes Audio Button
+        testAudioBtn.addEventListener('click', () => {
+            playEitsSound();
+        });
+
+        // Reset Game Button
+        resetGameBtn.addEventListener('click', () => {
+            attempts = 0;
+            attemptCounterEl.textContent = attempts;
+            egoLevelEl.textContent = '100%';
+            funnyMessageEl.textContent = '"Ayo dekati tombol EGO PEBI kalau berani! 😜"';
+            centerEgo();
+        });
+
+        window.addEventListener('resize', centerEgo);
+        window.onload = () => centerEgo();
+
+        // --- BACKGROUND CANVAS PARTICLES ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.alpha = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(236, 72, 153, ${this.alpha})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+</body>
+</html>
